@@ -10,92 +10,83 @@ class Admin
 {
     protected $view;
 
+    
     public function __construct()
     {
         $this->view = new View();
     }
 
-    //контроллер показа всех новостей в панели администратора
+    
+    //контроллер вывода страницы панели администратора (admin.php)
     public function actionIndex()
     {
-        $page = (int)$_GET['page'];
-        $count_p = \App\Models\News::count($page);
-        $page = $count_p[0];
-        $count_post = $count_p[1];
-        $news = $this->view->news = \App\Models\News::findAll($page);
-        $this->view->display('admin.php', $page, $news, $count_post );
+        $this->view->display(__DIR__ . '/../templates/admin.php');
     }
 
-    //контроллер открытия редактора для добвления одной новости в панели администратора
-    public function actionInsert()
+    
+    //контроллер вывода всех позиций товара в шаблон admin.php
+    public function actionAll()
     {
-        $this->view->display('insert.php', '', '', '');
+        $this->view->news = \App\Models\Admin::findAll();
+        $this->view->display(__DIR__ . '/../templates/table.php');
     }
 
-    //контроллер добавления новости в панели администратора
+    
+    //контроллер добавления позиции товара в панели администратора
     public function actionInsertOne()
     {
-        $title = $_POST['title'];
-        $date = $_POST['date'];
-        $text = $_POST['text'];
+        $tovar = $_POST['tovar'];
+        $category = $_POST['category'];
+        $prise = $_POST['prise'];
 
-        $obj = new \App\Models\News();
-        $data = $obj->validate($title, $date, $text);
+        $obj = new \App\Models\Admin();
+        $data = $obj->validate($tovar, $category, $prise);
 
-        if (!empty($data['title'] && $data['date'] && $data['text'])) {
-            $article = new \App\Models\News;
-            $article->title = $data['title'];
-            $article->date = $data['date'];
-            $article->text = $data['text'];
-            $article->insert();
-            echo 'Новость добавлена!';
-        } else {
-            echo 'Внимание!Новость не добавлена, не все поля заполнены, либо формат даты некорректен!';
+        if (!empty($data['tovar'] && $data['category'] && $data['prise'])) {
+            $position = new \App\Models\Admin();
+            $position->tovar = $data['tovar'];
+            $position->category = $data['category'];
+            $position->prise = $data['prise'];
+            $position->insert();
         }
     }
 
-    //контроллер показа существующей новости для редактирования в панели администратора
-    public function actionEdit()
-    {
-        $id = (int)$_GET['id'];
-        $news = $this->view->news = \App\Models\News::findOneById($id);
-        $this->view->display('edit.php', '', $news , '');
-    }
 
-    //контроллер обновления в базе данных отредактированной новости в панели администратора
+    //контроллер обновления в базе данных отредактированной позиции товара в панели администратора
     public function actionEditOne()
     {
-        $title = $_POST['title'];
-        $date = $_POST['date'];
-        $text = $_POST['text'];
+        
+        if(!empty($_POST['id']) && !empty($_POST['tovar']) && !empty($_POST['category']) && !empty($_POST['prise'])){
+            $tovar = $_POST['tovar'];
+            $category = $_POST['category'];
+            $prise = $_POST['prise'];
 
-        $obj = new \App\Models\News();
-        $data = $obj->validate($title, $date, $text);
+            $obj = new \App\Models\Admin();
+            $data = $obj->validate($tovar, $category, $prise);
 
-        if (!empty($_POST['id'] && $data['title'] && $data['date'] && $data['text'])) {
-            $article = new \App\Models\News;
-            $article->id = $_POST['id'];
-            $article->title = $data['title'];
-            $article->date = $data['date'];
-            $article->text = $data['text'];
-            $article->update();
-            echo 'Новость отредактирована!';
+            if (!empty($_POST['id'] && $data['tovar'] && $data['category'] && $data['prise'])) {
+                $position = new \App\Models\Admin();
+                $position->id = $_POST['id'];
+                $position->tovar = $data['tovar'];
+                $position->category = $data['category'];
+                $position->prise = $data['prise'];
+                $position->update();
+            }
+
         } else {
-            echo 'Внимание!Новость не отредактирована: не все поля заполнены, либо формат даты некорректен!';
+            die;
         }
+
     }
 
-    //контроллер удаления новости в панели администратора
+    
+    //контроллер удаления позиции товара
     public function actionDelete()
     {
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
-            $article = new \App\Models\News;
-            $article->delete($id);
-            $comment = new \App\Models\Comment;
-            $comment->delete($id);
-            header('Location: admin.php?ctrl=Admin&act=Index');
-            die;
+            $position = new \App\Models\Admin();
+            $position->delete($id);
         }
     }
 

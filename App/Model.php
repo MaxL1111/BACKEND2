@@ -11,28 +11,17 @@ abstract class Model
     public $id;
 
 
-   //метод выборки всех записей из таблицы
-    public static function findAll($page)
+    //метод выборки всех записей из таблицы
+    public static function findAll()
     {
-        $db = Db::instance();
+        $db = new \App\Db();
         return $db->query(
-            'SELECT * FROM ' . static::TABLE ,
+            'SELECT * FROM ' . static::TABLE,
             [],
             static::class
         );
     }
 
-    //метод выборки одной записи из таблицы
-    public static function findOneById($id)
-    {
-        $sql = 'SELECT * FROM ' . static::TABLE . ' WHERE id=:id';
-        $db = Db::instance();
-        return $db->query(
-            $sql,
-            [':id' => $id],
-            static::class
-        )[0];
-    }
 
     //метод проверки существования записи
     public function isNew()
@@ -43,10 +32,10 @@ abstract class Model
     //метод вставки новой записи в таблицу
     public function insert()
     {
-        if (!$this->isNew()) {
-            return;
-        }
-
+        /* if (!$this->isNew()) {
+             return;
+         }
+ */
         $columns = [];
         $values = [];
         foreach ($this as $k => $v) {
@@ -62,7 +51,7 @@ abstract class Model
         VALUES
         (' . implode(',', array_keys($values)) . ')
         ';
-        $db = Db::instance();
+        $db = new \App\Db();
         $db->execute($sql, $values);
     }
 
@@ -80,7 +69,7 @@ abstract class Model
         }
 
         $sql = 'UPDATE ' . static::TABLE . ' SET ' . implode(', ', $values) . ' WHERE id=:id';
-        $db = Db::instance();
+        $db = new \App\Db();
         $db->execute($sql, $columns);
     }
 
@@ -88,7 +77,7 @@ abstract class Model
     public function delete($id)
     {
         $sql = 'DELETE FROM ' . static::TABLE . ' WHERE id=:id';
-        $db = Db::instance();
+        $db = new \App\Db();
         $db->execute($sql, [':id' => $id])[0];
     }
 
